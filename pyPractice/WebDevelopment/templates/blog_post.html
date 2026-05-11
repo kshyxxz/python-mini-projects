@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Post {{id}}</title>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/style.css') }}"
+		/>
+	</head>
+	<body>
+		<h1>Blog</h1>
+		{% for post in posts %} {% if post.id == id %}
+		<hr />
+		<h2>{{post.title}}</h2>
+		<p class="container">{{post.content}}</p>
+		<hr />
+		{% endif %} {% endfor %}
+	</body>
+</html>

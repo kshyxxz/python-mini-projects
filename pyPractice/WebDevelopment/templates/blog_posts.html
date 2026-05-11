@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Posts</title>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/style.css') }}"
+		/>
+	</head>
+	<body>
+		<h1>Blog Posts</h1>
+		{% if pagination and 0 <= page_index < pagination|length %}
+		<section>
+			<h2>Page {{ page }}</h2>
+			{% for post in pagination[page_index] %}
+			<hr />
+			<h3>{{ post.title }}</h3>
+			<p class="container">{{ post.content }}</p>
+			<a href="/posts/{{ post.id }}">Read more</a>
+			{% endfor %}
+		</section>
+		{% else %}
+		<p>No posts available.</p>
+		{% endif %}
+	</body>
+</html>
