@@ -1,34 +1,55 @@
-from bs4 import BeautifulSoup
 import requests
-import urllib3
+from bs4 import BeautifulSoup
+import time
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+def fetch_page(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    else:
+        print(f"Failed to fetch page: {response.status_code}")
+        return None
 
-URL = "https://finance.yahoo.com/quote/GC%3DF/"
+def parse_html(html):
+    soup = BeautifulSoup(html, "html.parser")
+    return soup
 
-headers = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0 Safari/537.36"
-    )
-}
+def get_stock_price(ticker):
+    url = f"https://finance.yahoo.com/quote/{ticker}"
+    html = fetch_page(url)
+    if not html:
+        return None
 
-response = requests.get(
-    URL,
-    headers=headers,
-    verify=False,
-    timeout=10
-)
-soup = BeautifulSoup(response.text, "html.parser")
+    soup = parse_html(html)
+    price_tag = soup.find("fin-streamer", {"data-symbol": ticker, "data-field": "regularMarketPrice"})
+    if price_tag:
+        return price_tag.text
+    else:
+        print("Stock price not found.")
+        return None
 
-cards = soup.find_all("div", class_="ticker-item-wrapper yf-1o9ayn7")
+def track_stock_price(ticker, interval=60):
+    while True:
+        price = get_stock_price(ticker)
+        if price:
+            print(f"{ticker}: ${price}")
+        time.sleep(interval)
 
-stocks = []
+def main():
+    print("Welcome to the Stock Price Tracker!")
+    ticker = input("Enter the stock ticker symbol (e.g., AAPL, TSLA): ").upper()
+    interval = int(input("Enter the update interval (in seconds): "))
+    print(f"Tracking stock prices for {ticker} every {interval} seconds...")
+    track_stock_price(ticker, interval)
 
-for card in cards:
-	stock_name = soup.find("spna", class_="text neo-font-label-sm-emphasis yf-18d6y07")
-	stocks.append(stock_name)
+if __name__ == "__main__":
+    main()
 
 
-print(stocks)
+
+
+
+
+
+
+
